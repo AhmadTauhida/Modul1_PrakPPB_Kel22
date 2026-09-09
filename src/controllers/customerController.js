@@ -3,7 +3,8 @@ import { friendlyError, errorStatus } from "../utils/errors.js";
 export const CustomerController = {
 async getAll(req, res) {
 try {
-const customers = await CustomerModel.getAll();
+const { search } = req.query;
+const customers = await CustomerModel.getAll(search);
 res.json(customers);
 } catch (err) {
 res.status(500).json({ error: friendlyError(err) });
