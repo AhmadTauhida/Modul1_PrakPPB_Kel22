@@ -1,13 +1,16 @@
 import { supabase } from "../config/supabaseClient.js";
 export const CustomerModel = {
-async getAll(search) {
-let query = supabase.from("customers").select("*");
+async getAll(search, page = 1, limit = 10) {
+const from = (page - 1) * limit;
+const to = from + limit - 1;
+let query = supabase.from("customers").select("*", { count: "exact" });
 if (search) {
 query = query.ilike("name", `%${search}%`);
 }
-const { data, error } = await query;
+query = query.range(from, to);
+const { data, error, count } = await query;
 if (error) throw error;
-return data;
+return { data, count };
 },
 async getById(id) {
 const { data, error } = await supabase
