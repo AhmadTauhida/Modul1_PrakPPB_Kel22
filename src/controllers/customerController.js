@@ -1,5 +1,21 @@
 import { CustomerModel } from "../models/customerModel.js";
 import { friendlyError, errorStatus } from "../utils/errors.js";
+
+function validateCustomer(body) {
+  const errors = [];
+  if (body.email !== undefined && !body.email.includes("@")) {
+    errors.push("Email must contain @");
+  }
+  if (body.phone !== undefined && body.phone.length < 10) {
+    errors.push("Phone must be at least 10 characters");
+  }
+  if (errors.length > 0) {
+    const err = new Error(errors.join(", "));
+    err.status = 400;
+    throw err;
+  }
+}
+
 export const CustomerController = {
 async getAll(req, res) {
 try {
@@ -30,20 +46,22 @@ res.status(errorStatus(err, 404)).json({ error: friendlyError(err) });
 }
 },
 async create(req, res) {
-try {
-const customer = await CustomerModel.create(req.body);
-res.status(201).json(customer);
-} catch (err) {
-res.status(errorStatus(err, 400)).json({ error: friendlyError(err) });
-}
+  try {
+    validateCustomer(req.body);
+    const customer = await CustomerModel.create(req.body);
+    res.status(201).json(customer);
+  } catch (err) {
+    res.status(err.status || errorStatus(err, 400)).json({ error: friendlyError(err) });
+  }
 },
 async update(req, res) {
-try {
-const customer = await CustomerModel.update(req.params.id, req.body);
-res.json(customer);
-} catch (err) {
-res.status(errorStatus(err, 400)).json({ error: friendlyError(err) });
-}
+  try {
+    validateCustomer(req.body);
+    const customer = await CustomerModel.update(req.params.id, req.body);
+    res.json(customer);
+  } catch (err) {
+    res.status(err.status || errorStatus(err, 400)).json({ error: friendlyError(err) });
+  }
 },
 async remove(req, res) {
 try {
