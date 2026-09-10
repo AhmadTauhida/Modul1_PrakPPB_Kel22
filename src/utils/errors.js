@@ -8,8 +8,8 @@ if (/violates foreign key constraint/i.test(msg))
 return "Cannot delete: this record is still referenced by other data";
 if (/violates check constraint|violates not-null constraint|null value in column/i.test(msg))
 return "The submitted data violates a database rule";
-if (/insufficient stock|not found|invalid quantity|must be a non-empty array/i.test(msg))
-return msg;
+if (/insufficient stock|not found|invalid quantity|must be a non-empty array|Email harus mengandung|Nomor telepon harus minimal 10 karakter|Email must contain|Phone must be at least/i.test(msg))
+  return msg;
 return "Something went wrong, please try again";
 }
 
@@ -22,4 +22,8 @@ return 400;
 if (/violates foreign key constraint|duplicate key value|null value in column|violates check constraint/i.test(msg))
 return 400;
 return fallback;
+}
+
+export function handleError(res, err, fallback = 500) {
+  res.status(errorStatus(err, fallback)).json({ error: friendlyError(err) });
 }
