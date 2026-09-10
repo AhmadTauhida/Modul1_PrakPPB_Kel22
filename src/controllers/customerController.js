@@ -19,10 +19,10 @@ function validateCustomer(body) {
 export const CustomerController = {
   async getAll(req, res) {
     try {
-      const { search, page = 1, limit = 10 } = req.query;
+      const { name, page = 1, limit = 10 } = req.query;
       const pageNum = Math.max(1, parseInt(page));
       const limitNum = Math.min(100, Math.max(1, parseInt(limit)));
-      const { data, count } = await CustomerModel.getAll(search, pageNum, limitNum);
+      const { data, count } = await CustomerModel.getAll(name, pageNum, limitNum);
       const totalPages = Math.ceil(count / limitNum);
       res.json({
         data,
